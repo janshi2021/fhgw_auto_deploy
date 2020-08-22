@@ -1,0 +1,312 @@
+### Version numbering:
+###    X.0.0
+###        - Major structural changes compared to the previous version.
+###        - Requires all users to update their user configuration to
+###          the new template
+###    a.X.0
+###        - Significant changes in the template within current structure
+###          (e.g. new mandatory attributes)
+###        - Requires all users to update their user configuration according
+###          to the new template (e.g. add new mandatory attributes)
+###    a.b.X
+###        - Minor changes in template (e.g. new optional attributes or
+###          changes in possible values, value ranges or default values)
+###        - Backwards compatible
+###    comment: Comissioning>> should the s/w fail saying that the schema mismatch? may be a schema template check
+###    comment: TS guide update to check schema version
+schemaVersion: 4.0.1
+
+FHGW:
+    ### This parameter defines Fronthaul gateway identifier and is used to uniquely
+    ### identify the Fronthaul gateway in the network. The parameter is defined
+    ### while installation of the Fronthaul gateway and can never be changed unless
+    ### the Fronthaul gateway is again newly installed.
+    ### Valid Input Range: 1..68719476735
+    ### example - fhgwId: "1234"
+    fhgwId: 20
+
+    ### This parameter defines Fronthaul gateway name and is used for uniquely identifying the
+    ### Fronthaul Gateway in the network with user friendly name. ### It is not used for any Telecom purposes.
+    ### The name had to be 1..80 characters
+    ### FHGW name can consist of lower and case letters [A-Z,a-z], digits [0-9] and hyphen (-)
+    ### comment: spaces and tabs to be ignored
+    ### example - fhgwName: "FHGW-NY"
+    fhgwName: FHGW-20
+
+    ### This parameter defines the hostname of the FHGW management node
+    ### The hostname is NOT USED for connecting with the NE from external network and is not required to be registered
+    ### with the external DNS server.
+    ### NOTE: DO NOT CHNAGE THIS CONFIGURATION PARAMETER AS THE HOSTNAME IS USED FOR ALL INTERNAL USAGE
+    hostname: "controller"
+
+### Time related configuration
+TIME:
+    ### Time zone name  (e.g. Europe/Helsinki or Asia/Shanghai)
+    ### List of supported timezones are available in the customer documentation
+    fhgwTimezone: "Asia/Kolkata"
+
+USERS:
+    ### The parameter defines the admin user account that have the priveledges to promote itself to root account
+    ### The user account shall be used during commissioning to execute commands that requires root priveledges
+    ### default admin user name is _nokfhgwoperator and is not modifiable
+    ### adminUsername: _nokfhgwoperator
+    ### Example how to create SHA512 password hash that can be given as
+    ### the admin password:
+    ### python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.using(rounds=5000).hash(getpass.getpass())"
+    ### The maximum password length should not exceed 256
+    adminPassword: "$1$J8k5aLu5$vhl1J3d0ekBcbos3XwPfk1"
+
+    ### Example how to create SHA512 password hash that can be given as
+    ### the root password:
+    ### python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.using(rounds=5000).hash(getpass.getpass())"
+    ### The maximum password length should not exceed 256
+    rootPassword: "$1$6vfgeYys$Fx3CSTNjKYyMaiACHtc.p."
+
+### Networking configuration
+NETWORKING:
+    ### This parameter defines the public IP address of the  Domain Name Server (DNS).
+    ### If the parameter has a valid value, this server is queried first for any domain name resolution
+    ### The paramter can take list of IPV6 addresses that corresponds to the DNS server
+    ### example - dnsServer: "ABCD:EF01:2345:6789:ABCD:EF01:2345:6789, ABCD:EF01:2345:6789:ABCD:EF01:2345:1234"
+    dnsServer: "10.58.112.113"
+
+    ### The sub-tree defines the network configuration attributes for internal network
+    INTERNAL_NET:
+        ### This parameter define internal vlans used in FHGW. In current MVP Total 95 vlans from BASE_INTERNAL_VLAN is used for
+        ### internal communication and should not be configured by operator.
+        ### NOTE: DO NOT CHANGE THIS CONFGURATION UNLESS THIS RANGE CONFLICTS WITH NETWORK PLAN
+        vlanIdRangeStart: "4000"
+        vlanIdRangeEnd: "4095"
+
+    ### The sub-tree defines the network attributes for accessing the Network Element
+    EXTERNAL_NET:
+        NET_DOMAINS:
+
+            ### User defined name for network domain to define network configuration parameters
+            ### to access the NE from/to external servers
+            ### The network configuration allows the NE to be accessed using SSH and Network Operations Manager
+            ### The network configuration allows the NE to access repository servers
+            NET_MANAGEMENT:
+
+                ### The configuration parameters defines the networking details for the management (NOM/SSH) of the network entity
+                OAM:
+                    ### The parameter defines the ethernet interface name (unique)
+                    ### The ethernet interface details are available in customer documentation
+                    ### for OAM management network, the real ethernet interface is "eth2"
+                    ### NOTE: DO NOT MAKE ANY UPDATES TO THIS CONFIGURATION.
+                    ETHIF:
+                        ethIfName: eth0
+
+                        ### This parameter defines the Maximum Transmission Unit of the VLAN Interface.
+                        ### Optional. Default network device mtu is 1500.
+                        ### Valid value: From 1200 to 1600 (increment by 1)
+                        ### When not set, default 1500 is used.
+                        mtu: 1500
+
+                    ### This parameter indicates the IPv4 Address
+                    ### IPv4 Address format: Dot-decimal notation (x.x.x.x). Example: 10.10.10.10
+                    IPADDRESSV4:
+                        ### IPv4 Address
+                        ipAddress: 10.43.70.166
+
+                        ### Network mask length for the IPv4 address
+                        ### integer in range 1-32 for Ipv4
+                        ipPrefixLength: 28
+
+                    ### This parameter indicates the IPv6 address
+                    ### IPv6 Address format: x:x:x:x:x:x:x:x. Example: ABCD:EF01:2345:6789:ABCD:EF01:2345:6789
+                    ### It is recommended to use long format to define IPv6 address.
+                    #IPADDRESSV6:
+                        ### IPv6 Address
+                        #ipAddress: "2a00:8a00:a000:1160:0:0:a3e:4853"
+
+                        ### Network mask length for the IPv6 address
+                        ### integer in range  1-128 for IPv6
+                        #ipPrefixLength: 122
+
+                    ### The parameter defines the vlan configuration
+                    ### The vlan configuration is optional.
+                    ### vlan configuration mandatorily requires below parameters
+                    ### 1) vlanIfName   => name of the vlan interface.
+                    ### 2) vlanId      => vlan identifier
+                    #VLANIF:
+                        ### The parameter defines the vlan interface name
+                        ### Format: vlan interface name is a string
+                        #vlanIfName:<vlan interface Name>
+
+                        ### This parameter defines the VLAN ID to be used at this VLAN interface.
+                        ### vlan id  value can be between 2-4095, excluding internal vlan range
+                        ### comment: this vlan id is outside the internal vlan range. describe this here
+                        #vlanId: <vlan id>
+
+                        ### Optional. Default is network device mtu.
+                        ### Valid value range: 1280 - 9000
+                        #mtu :
+
+                    ### The sub-tree defines the static route configurations for the network
+                    ### The configuration consists of list(s) of static route details
+                    ### Each static route configuration can consists of
+                    ### 1. destination_address => IPv4 address
+                    ### 2. gateway => IPv4 address
+                    ### 3. destIpPrefixLength => network mask length
+                    ### User should configure at-least one route (default gateway).
+                    ROUTE:
+                        staticRoute-1:
+                            ### This parameter defines the destination IPv4 address
+                            ### for indirectly connected IP nodes (remote network).
+                            ### If a default gateway shall be defined, its value is to be set to 0.0.0.0
+                            ### IPv4 Address format: Dot-decimal notation (x.x.x.x). Example: 10.10.10.10
+                            destIpAddress: 0.0.0.0
+
+                            ### This parameter defines the network mask for route
+                            ### integer in range 1-32 for Ipv4. For default route destIpPrefixLength value is not required.
+                            destIpPrefixLength: 24
+
+                            ### This parameter defines the IPv4 address of the next hop gateway from which
+                            ### destination IP address can be reached.
+                            ### IPv4 Address format: Dot-decimal notation (x.x.x.x). Example: 10.10.10.10
+                            gateway: "10.43.70.161"
+
+                        #staticRoute-2:
+                            ### This parameter defines the destination IPv4 address
+                            ### for indirectly connected IP nodes (remote network).
+                            ### If a default gateway shall be defined, its value is to be set to 0.0.0.0
+                            ### IPv4 Address format: Dot-decimal notation (x.x.x.x). Example: 10.10.10.10
+                            #destIpAddress: <IPAddress >
+
+                            ### This parameter defines the network mask for route
+                            ### integer in range 1-32 for Ipv4. For default route destIpPrefixLength value is not required.
+                            #destIpPrefixLength:< IP prefix length>
+
+                            ### This parameter defines the IPv4 address of the next hop gateway from which
+                            ### destination IP address can be reached.
+                            ### IPv4 Address format: Dot-decimal notation (x.x.x.x). Example: 10.10.10.10
+                            #gateway: <IPAddress>
+
+                    ### The sub-tree defines the static route configurations for the network
+                    ### The configuration consists of list(s) of static route details
+                    ### Each static route configuration can consists of
+                    ### 1. destination_address => IPv6 address
+                    ### 2. gateway => IPv6 address
+                    ### 3. destIpPrefixLength => network mask length
+                    ### User should configure at-least one route if IPv6 Address configured (default gateway).
+                    ### NOTE: FOR ACCESSING OTHER NETWORK ELEMENTS IT IS NOT NECESSARY THAT CLIENT ALWAYS IS CONFIGURED WITH THE
+                    ### SOURCE ADDRESS. WHEN THE CLIENT DOES NOT EXPLICITLY STATE THE SOURCE IP ADDRESS, THE NETWORK STACK FILLS
+                    ### SOURCE IP ADDRESSLIKE DOCKER REGISTRY OR HELM REPOSITORY
+                    #ROUTE6:
+                    #    staticRoute-1:
+                            ### This parameter defines the destination IPv6 address
+                            ### for indirectly connected IP nodes (remote network).
+                            ### If a default gateway shall be defined, its value is to be set to ::
+                            ### IPv6 Address format: x:x:x:x:x:x:x:x. Example: ABCD:EF01:2345:6789:ABCD:EF01:2345:6789
+                            #destIpAddress: "::"
+
+                            ### This parameter defines the network mask for route
+                            # integer in 1-128 for IPv6. For default route destIpPrefixLength value not is required.
+                            #destIpPrefixLength: 122
+
+                            ### This parameter defines the IPv6 address of the next hop gateway from which
+                            ### destination IP address can be reached.
+                            ### IPv6 Address format: x:x:x:x:x:x:x:x. Example: ABCD:EF01:2345:6789:ABCD:EF01:2345:6789
+                            #gateway: "2a00:8a00:a000:1160:0:0:a3e:4841"
+
+                        #staticRoute-2:
+                            ### This parameter defines the destination IPv6 address
+                            ### for indirectly connected IP nodes (remote network).
+                            ### If a default gateway shall be defined, its value is to be set to ::
+                            ### IPv6 Address format: x:x:x:x:x:x:x:x. Example: ABCD:EF01:2345:6789:ABCD:EF01:2345:6789
+                            #destIpAddress: <IPAddress >
+
+                            ### This parameter defines the network mask for route
+                            ### integer in 1-128 for IPv6. For default route destIpPrefixLength value is not required.
+                            #destIpPrefixLength:< IP prefix length>
+
+                            ### This parameter defines the IPv6 address of the next hop gateway from which
+                            ### destination IP address can be reached.
+                            ### IPv6 Address format: x:x:x:x:x:x:x:x. Example: ABCD:EF01:2345:6789:ABCD:EF01:2345:6789
+                            #gateway: <IPAddress>
+
+    ### The sub-tree defines the necessary/mandatory configurations for the switch ports that are
+    ### required for the NE commissioning and initial deployment
+    ### The configuration enables the NE switch port to establish ethernet link
+    L2SWI:
+        ### The configuration defines the front panel port configurations
+        ### defines the below parameters
+        ### 1. portId => Front panel port number
+        ### 2. speed => transmission rate of the port.
+        ### Note: The physical port 1 is configured for FHGW management (OAM) ethernet traffic
+        PORT:
+            ### This parameter indicates the hardware port of FHGW.
+            ### The front panel physical port 1 is configured for ethernet traffic and the ethernet link is used for FHGW management network
+            ### DO NOT MAKE ANY UPDATES TO THIS CONFIGURATION PARAMETER. BY DEFAULT THE NE OAM MANAGEMENT PORT IS CONFIGURED TO BE PORT1
+            #portId: 1
+
+            ### This parameter defines the speed of the port in gigabits per second.
+            ### The parameter represents the number of gigabits that can be transmitted each second.
+            ### Allowed values are "10G" and "1G"
+            ### Example - speed: "10G"
+            speed: "10G"
+
+            ### This parameter defines the auto-negotiation configuration of the port. If auto-negotiation is enabled on a port,
+            ### tranmission parameters (like speed, duplex mode and flow control) are negotiated with the connected remote
+            ### device to operate on the best match possible. The connected remote device also should support auto-negotiation
+            ### for this to work.
+            ### The allowed values are
+            ### Value   Name        Default
+            ### 0           Disabled    Y
+            ### 1           Enabled
+            autoNeg: "Disabled"
+
+            ### This parameter defines the Maximum Transmission Unit set on the port.
+            ### The parameter defines the maximum packet length that can be transferred through this port.
+            ### Optional. Default network device mtu is 1500.
+            ### Valid value: from 1200 to 9000 step 1 (increment by 1)
+            ### When not set, default 1500 is used.
+            #mtu:
+
+            ### This parameter defines the forward error correction(FEC) mode of a port.
+            ### The intent of FEC is to reduce bit error rate (BER)in data transmission.
+            ### There are mainly two types of FECs supported, RS-FEC(Reed Solomon FEC) and FC(FireCode/Base-R).
+            ### Same type of FEC has to be enabled on both sides of the link to work properly.
+            ### Possible values: none, rs, fc. Default none
+            fec: none
+
+CAAS:
+    HELM:
+        ### The configuration parameter defines the URL for the helm repository
+        ### The URL, when given in DNS FQDN format, the corresponding FQDN must be registered with the DNS server
+        ### Example - registryURL: "registry.kube-system.svc.nokia.net"
+        registryURL: "https://bhisoj70.apac.nsn-net.net/artifactory/fhgw-ci-helm-virtual"
+        
+        ### All the infrastructure's HTTP servers are secured with TLS.
+        ### The certificates of the servers are created in infrastructure deployment time, and are signed by an externally provided CA certificate.
+        ### This CA certificate can be configured by setting its encrypted format into this configuration parameter.
+        ### e.g. ["U2FsdGVkX1+iaWyYk3W01IFpfVdughR5aDKo2NpcBw2USt.."]
+        ### The parameter is applicable if secured mode of communication is supported. If the parameter is <empty>,
+        ### non-secure communication will be established with the server.
+        encryptedCACert: None
+
+    DOCKER:
+        ### The configuration parameter defines the URL for the docker registry
+        ### The URL, when given in DNS FQDN format, the corresponding FQDN must be registered with the DNS server
+        ### Example - registryURL: "registry.kube-system.svc.nokia.net"
+        registryURL: "fhgw-ci-docker-local.bhisoj70.apac.nsn-net.net"
+
+        ### All the infrastructure's HTTP servers are secured with TLS.
+        ### The certificates of the servers are created in infrastructure deployment time, and are signed by an externally provided CA certificate.
+        ### This CA certificate can be configured by setting its encrypted format into this configuration parameter.
+        ### e.g. ["U2FsdGVkX1+iaWyYk3W01IFpfVdughR5aDKo2NpcBw2USt.."]
+        ### The parameter is applicable if secured mode of communication is supported. If the parameter is <empty>,
+        ### non-secure communication will be established with the server.
+        encryptedCACert: None
+
+NMS:
+    ### The section provides the configuration parameters for the NE to connect with the Network Operations Master (NOM)
+    ### The configuration parameters include
+    ### a) tlsMode
+   
+    ### The parameter is set to "true" when the tls mode is enabled
+    ### When the tls mode is enabled, it is necessary that the certificates are mandatorily configured manually
+    ### The tls mode can be set to "false", in which case the NE and the NOM connectivity will be non-secure
+    ### The default value for this parameter is "true". 
+    tlsMode: "true"

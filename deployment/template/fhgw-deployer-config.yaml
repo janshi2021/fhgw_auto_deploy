@@ -1,0 +1,124 @@
+### Version numbering:
+###    X.0.0
+###        - Major structural changes compared to the previous version.
+###        - Requires all users to update their user configuration to
+###          the new template
+###    a.X.0
+###        - Significant changes in the template within current structure
+###          (e.g. new mandatory attributes)
+###        - Requires all users to update their user configuration according
+###          to the new template (e.g. add new mandatory attributes)
+###    a.b.X
+###        - Minor changes in template (e.g. new optional attributes or
+###          changes in possible values, value ranges or default values)
+###        - Backwards compatible
+###    comment: Comissioning>> should the s/w fail saying that the schema mismatch? may be a schema template check
+###    comment: TS guide update to check schema version
+schema version: 1.0.0
+
+HOST:
+    ### The network domain to define network configuration parameters
+    ### The network configuration allows the DEPLOYER to activate the network
+    ### configuration to the host in which the DEPLOYER application is deployed
+    ### The network configuration allows the DEPLOYER application to communicate with the FHGW
+    ### during installation
+    NETWORKING:
+
+        ### The parameter defines the ethernet interface name (unique) on the host that
+        ### should be used by DEPLOYER application
+        ### The ethernet interface name shall be used by the DHCP server and the DEPLOYER application
+        ### NOTE: DO NOT MAKE ANY UPDATES TO THIS CONFIGURATION
+        ethIfName: ens224
+
+        ### This parameter indicates the IPv4 Address
+        ### IPv4 Address format: Dot-decimal notation (x.x.x.x). Example: 10.10.10.10
+        ### IPv4 address should be in the same subnet as 192.168.0.X
+        ### NOTE: DO NOT MAKE ANY UPDATES TO THIS CONFIGURATION
+        ### The default ip address is 192.168.0.2
+        ipAddress: "192.168.0.2"
+
+    ### The section provides the configuration parameters used for configuring the
+    ### DHCP server
+    DHCP:
+        ### This parameter indicates the start address range of IP address
+        ### IPv4 Address format: Dot-decimal notation (x.x.x.x). Example: 10.10.10.10
+        ### The IP address will be offered to the FHGW when commissioning during PXE Boot.
+        ### The IP address must be in the same subnet of "192.168.0.x" (example: 192.168.0.1/24)
+        ### DEPLOYER application supports for upto 5 FHGW installations for 3U chassis and
+        ### upto 3 FHGW installations for 2U chassis, the IP address range can include
+        ### maximum 5 IP address
+        ipAddressRangeStart:
+
+        ### This parameter indicates the start address range of IP address
+        ### IPv4 Address format: Dot-decimal notation (x.x.x.x). Example: 10.10.10.10
+        ### The IP address will be offered to the FHGW when commissioning during PXE Boot.
+        ### The IP address must be in the same subnet of "192.168.0.x" (example: 192.168.0.1/24)
+        ### DEPLOYER application supports for upto 5 FHGW installations for 3U chassis and
+        ### upto 3 FHGW installations for 2U chassis, the IP address range can include
+        ### maximum 5 IP address
+        ipAddressRangeEnd:
+
+### This defines all the configuration parameters used by DEPLOYER application to configure each
+### FHGW for installation
+FHGW_CONFIGURATION:
+    ### The FHGW supports PXE boot using both legacy BIOS and UEFI
+    ### The default PXE boot is UEFI
+    ### The parameter allows the configuring the PXE boot option to one of either the legacy BIOS or UEFI
+    ### allowed values:
+    ###     LEGACY  - Legacy BIOS (Default)
+    ###     EFI     - UEFI
+    PXEBootOption: pxe
+
+    ### This parameter defines the name of the software delivery with which the NE had to be installed
+    ### Ex: FHGW_20.009_2005051837_aa051b8_base
+    softwareDelivery:
+
+    ### This defines all the configuration parameters used by DEPLOYER application to configure each
+    ### FHGW for installation
+    ### Each domain is defined as FHGW-<slot position>. slot position is the slot identifier within the
+    ### chassis in which the FHGW is installed
+    FHGW-1:
+        ### The parameter defines the MAC address of the FHGW-BMC
+        ### The MAC address is available on the OE FHGW hardware as printed label
+        ### The MAC address allows the DHCP server to offer IP address to valid NE's
+        bmcMACAddress:
+
+    ### This defines all the configuration parameters used by DEPLOYER application to configure each
+    ### FHGW for installation
+    ### Each domain is defined as FHGW-<slot position>. slot position is the slot identifier within the
+    ### chassis in which the FHGW is installed
+    #FHGW-2:
+        ### The parameter defines the MAC address of the FHGW-BMC
+        ### The MAC address is available on the OE FHGW hardware as printed label
+        ### The MAC address allows the DHCP server to offer IP address to valid NE's
+        #bmcMACAddress:
+
+    ### This defines all the configuration parameters used by DEPLOYER application to configure each
+    ### FHGW for installation
+    ### Each domain is defined as FHGW-<slot position>. slot position is the slot identifier within the
+    ### chassis in which the FHGW is installed
+    #FHGW-3:
+        ### The parameter defines the MAC address of the FHGW-BMC
+        ### The MAC address is available on the OE FHGW hardware as printed label
+        ### The MAC address allows the DHCP server to offer IP address to valid NE's
+        #bmcMACAddress:
+
+    ### This defines all the configuration parameters used by DEPLOYER application to configure each
+    ### FHGW for installation
+    ### Each domain is defined as FHGW-<slot position>. slot position is the slot identifier within the
+    ### chassis in which the FHGW is installed
+    #FHGW-4:
+        ### The parameter defines the MAC address of the FHGW-BMC
+        ### The MAC address is available on the OE FHGW hardware as printed label
+        ### The MAC address allows the DHCP server to offer IP address to valid NE's
+        #bmcMACAddress:
+
+    ### This defines all the configuration parameters used by DEPLOYER application to configure each
+    ### FHGW for installation
+    ### Each domain is defined as FHGW-<slot position>. slot position is the slot identifier within the
+    ### chassis in which the FHGW is installed
+    #FHGW-5:
+        ### The parameter defines the MAC address of the FHGW-BMC
+        ### The MAC address is available on the OE FHGW hardware as printed label
+        ### The MAC address allows the DHCP server to offer IP address to valid NE's
+        #bmcMACAddress:

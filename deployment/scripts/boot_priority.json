@@ -1,0 +1,8 @@
+{
+        "Boot": {
+                "BootSourceOverrideEnabled": "SOURCE_OVERRIDE",
+                "BootSourceOverrideMode": "BOOT_MODE",
+                "BootSourceOverrideTarget": "BOOTDEVICE"
+        }
+}
+
