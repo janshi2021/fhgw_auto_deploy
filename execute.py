@@ -73,4 +73,8 @@ if __name__ == "__main__":
                                    fhgw_netmask=fhgw_netmask,
                                    fhgw_gateway=fhgw_gateway,
                                    image_tag=image_tag)
-    iso_deployment.execute()
+    try:
+        iso_deployment.setup()
+        iso_deployment.execute()
+    finally:
+        iso_deployment.teardown()

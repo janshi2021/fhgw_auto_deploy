@@ -351,24 +351,3 @@ class ClearFirewallAndStopRelatedSerices(NoPostCheckStep):
         self._pxe_operator.execute("systemctl stop firewalld")
         self._pxe_operator.execute("systemctl stop tftp.socket")
 
-class WaitUntilCurrentInstallationFinished(NoPostCheckStep):
-
-    def _run(self):
-        pxe_operator = self.get_param("pxe_operator")
-        log_path = "/var/lib/docker/volumes/output/_data/nokia/SoftwareInstall/sessions/fhgw/log"
-        if not pxe_operator.file_exists(log_path):
-            return
-        all_log_line_str = pxe_operator.execute("find {log_path} -name FSETUP.LOG".format(log_path=log_path))
-        if not all_log_line_str.strip():
-            return
-        lines = all_log_line_str.splitlines()
-        lines = [line for line in lines if line.strip()]
-
-
-
-
-
-
-
-
-
