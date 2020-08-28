@@ -322,9 +322,9 @@ class TriggerFHGWStartInstallation(RetriedStep):
         self._pxe_operator.execute("chmod +x /root/setbootdevice.sh")
         return True
 
-    def _wait_until_fhgw_connection_created(self):
+    def _wait_until_fhgw_connection_created(self, timeout=25 * 60):
         start_time = time.time()
-        while time.time() - start_time < 20 * 60:
+        while time.time() - start_time < timeout:
             try:
                 self._fhgw_operator.new_connection()
                 break
@@ -346,11 +346,13 @@ class TriggerFHGWStartInstallation(RetriedStep):
                 continue
             time.sleep(5)
         time.sleep(20)
-
-    def post_check(self):
         result = self._wait_until_fhgw_connection_created()
         if not result:
-            self._logger.warn("fhgw connection can't be created in 20 minutes")
+            self._logger.warn("fhgw connection can't be created in 25 minutes")
+
+    def post_check(self):
+        result = self._wait_until_fhgw_connection_created(30)
+        if not result:
             return False
         current_release = self._fhgw_operator.fhgw_get_sw_release()
         current_build = self._fhgw_operator.fhgw_get_sw_build()

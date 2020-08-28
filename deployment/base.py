@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 import six
 import logging
 from .operator import PXEServerOperator, FHGWOperator
+from .exceptions import ExecutionException
 
 
 @six.add_metaclass(ABCMeta)
@@ -50,7 +51,7 @@ class Deployment(object):
             self._logger.info("## start to do pre-check of step {step_name}".format(step_name=step.step_name))
             if not step.pre_check():
                 self._logger.error("## pre check of step {step_name} failed, rest step will be drop".format(step_name=step.step_name))
-                break
+                raise ExecutionException("pre check of step {step_name} failed, rest step will be drop".format(step_name=step.step_name))
             if not isinstance(step, NoPostCheckStep) and step.post_check():
                 self._logger.info("## post check passed, step {step_name} ignored".format(step_name=step.step_name))
                 continue
@@ -59,10 +60,10 @@ class Deployment(object):
             self._logger.info("## start to do post-check of step {step_name}".format(step_name=step.step_name))
             if not step.post_check():
                 self._logger.error("## post check of step {step_name} failed, please have a check".format(step_name=step.step_name))
-                break
+                raise ExecutionException("post check of step {step_name} failed, please have a check".format(step_name=step.step_name))
             if not step.cont:
                 self._logger.warn("## the deployment should be end after this step {step_name}".format(step_name=step.step_name))
-                break
+                raise ExecutionException("the deployment should be end after this step {step_name}".format(step_name=step.step_name))
             self._global_params = step.global_params
             if step.step_to_go:
                 self._logger.warn("## step {step_name} will go to another step {another_step_name} to exeucte ".format(
@@ -70,6 +71,7 @@ class Deployment(object):
                     another_step_name=step.step_to_go
                 ))
                 self._steps = step_list[self._get_step_list_index(step_list, step.step_to_go):]
+        self._logger.info("fhgw installation finished successfully")
 
     @abstractmethod
     def setup(self):
