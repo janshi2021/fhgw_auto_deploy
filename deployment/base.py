@@ -47,25 +47,25 @@ class Deployment(object):
         while self._steps:
             step = self._steps.pop(0)
             step.global_params = self._global_params
-            self._logger.info("start to do pre-check of step {step_name}".format(step_name=step.step_name))
+            self._logger.info("## start to do pre-check of step {step_name}".format(step_name=step.step_name))
             if not step.pre_check():
-                self._logger.error("pre check of step {step_name} failed, rest step will be drop".format(step_name=step.step_name))
+                self._logger.error("## pre check of step {step_name} failed, rest step will be drop".format(step_name=step.step_name))
                 break
             if not isinstance(step, NoPostCheckStep) and step.post_check():
-                self._logger.info("post check passed, step {step_name} ignored".format(step_name=step.step_name))
+                self._logger.info("## post check passed, step {step_name} ignored".format(step_name=step.step_name))
                 continue
-            self._logger.info("### start to execute step {step_name} ###".format(step_name=step.step_name))
+            self._logger.log_header("start to execute step {step_name}".format(step_name=step.step_name))
             step.execute()
-            self._logger.info("start to do post-check of step {step_name}".format(step_name=step.step_name))
+            self._logger.info("## start to do post-check of step {step_name}".format(step_name=step.step_name))
             if not step.post_check():
-                self._logger.error("post check of step {step_name} failed, please have a check".format(step_name=step.step_name))
+                self._logger.error("## post check of step {step_name} failed, please have a check".format(step_name=step.step_name))
                 break
             if not step.cont:
-                self._logger.warn("the deployment should be end after this step {step_name}".format(step_name=step.step_name))
+                self._logger.warn("## the deployment should be end after this step {step_name}".format(step_name=step.step_name))
                 break
             self._global_params = step.global_params
             if step.step_to_go:
-                self._logger.warn("step {step_name} will go to another step {another_step_name} to exeucte ".format(
+                self._logger.warn("## step {step_name} will go to another step {another_step_name} to exeucte ".format(
                     step_name=step.step_name,
                     another_step_name=step.step_to_go
                 ))

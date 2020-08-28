@@ -1,5 +1,6 @@
 import time
 
+
 class Logger(object):
 
     def _get_timestamp(self):
@@ -11,11 +12,16 @@ class Logger(object):
         return timestamp
 
     def info(self, msg):
-
         print("<<INFO - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+
+    def debug(self, msg):
+        print("<<DEBUG - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
 
     def warn(self, msg):
         print("<<WARN - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
 
     def error(self, msg):
         print("<<ERROR - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+
+    def log_header(self, msg):
+        print("<<STEP - {timestamp}>>: ####".format(timestamp=self._get_timestamp()) + msg.upper())

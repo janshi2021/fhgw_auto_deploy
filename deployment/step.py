@@ -36,6 +36,7 @@ class FHGWParamInitialize(NoPostCheckStep):
                        fhgw_release=fhgw_release,
                        input_data_path=input_data_path,
                        output_data_path=output_data_path)
+        self._logger.info("current global parameters are {}".format(self.global_params))
 
 
 class FHGWVersionCheck(NoPostCheckStep):
@@ -49,9 +50,10 @@ class FHGWVersionCheck(NoPostCheckStep):
         if (real_sw_build == fhgw_build and real_sw_release == fhgw_release):
             self._logger.info("Expected build {expected_version} is equal "
                               "to current build {current_version}".format(
-                expected_version=fhgw_release + fhgw_build,
-                current_version=real_sw_release + real_sw_build
+                expected_version=fhgw_release + "_" + fhgw_build,
+                current_version=real_sw_release + "_" + real_sw_build
             ))
+            self._logger.info("target version is equal to expected version")
             # will not execute next steps
             self.cont = False
 
@@ -67,15 +69,22 @@ class FHGWISOPreparation(RetriedStep):
             iso_version=self._fhgw_iso_version + file_suffix,
             input_data_path=self.get_param("input_data_path")
         )
-        self._pxe_operator.execute(download_cmd)
+        result = self._pxe_operator.execute(download_cmd)
+        self._logger.info("download iso successfully")
+        self._logger.debug(result)
 
     def _sha256check(self):
         if not self._pxe_operator.file_exists(self._iso_file_path + ".sha256"):
             self._download(".iso.sha256")
         sha256_code = self._pxe_operator.execute("cat {iso_sha256_file_path}".format(iso_sha256_file_path=self._iso_file_path + ".sha256"))
         generate_code = self._pxe_operator.execute("sha256sum {iso_file_path} | awk '{{print $1}}'".format(iso_file_path=self._iso_file_path))
+        self._logger.debug("sha256 code in sha256 file is {sha256_code} and generated sha256 code is {generated_sha256_code}".format(
+            sha256_code=sha256_code,
+            generated_sha256_code=generate_code))
         if sha256_code.strip() == generate_code.strip():
+            self._logger.debug("iso file sha256 check is ok")
             return True
+        self._logger.debug("iso file sha256 check is not ok")
         return False
 
     def pre_check(self):
@@ -98,7 +107,9 @@ class FHGWISOPreparation(RetriedStep):
         if self._pxe_operator.file_exists(self._iso_file_path):
             self._wait_iso_file_size_changed_finished()
             if self._sha256check():
+                self._logger.info("sha256 of iso build check passed")
                 return True
+        self._logger.error("sha256 of iso build check failed")
         return False
 
     def _run(self):
@@ -114,14 +125,17 @@ class PXEStopAllDockers(Step):
         return True
 
     def _run(self):
+        docker_instances = self.pxe_operator.get_docker_instances()
         running_docker_id_list = []
-        for docker_instance in self.docker_instances:
+        for docker_instance in docker_instances:
             running_docker_id_list.append(docker_instance["id"])
         self.pxe_operator.stop_docker_by_ids(running_docker_id_list)
+        self._logger.info("runnder container list {} have been stoped".format(running_docker_id_list))
 
     def post_check(self):
         docker_instances = self.pxe_operator.get_docker_instances()
-        for docker_instance in docker_instances:
+        self._loger.info("docker instances are {}".format(docker_instances))
+        for docker_instance in self.docker_instances:
             if docker_instance["status"] == "up":
                 return False
         return True
@@ -146,6 +160,7 @@ class PXEDockerExist(Step):
     def post_check(self):
         for docker_item in self.pxe_operator.get_docker_instances():
             if docker_item["image_uri"] == self.image_uri and docker_item["status"] == "up":
+                self._logger.debug("matched docker instance is exist")
                 self.put_param(docker_exists=True)
         self.put_param(docker_exists=False)
         return True
@@ -162,10 +177,10 @@ class PXERemoveExistDocker(Step):
         running_docker_ids = [docker_instance["id"] for docker_instance in docker_instances if docker_instance["status"] == "up"]
         self._pxe_operator.stop_docker_by_ids(running_docker_ids)
         self._pxe_operator.remove_docker(docker_instances)
+        self._logger.info("remove docker instances {} successfully".format(docker_instances))
 
     def post_check(self):
-        pxe_operator = self.get_param("pxe_operator")
-        if pxe_operator.get_docker_instances():
+        if self._pxe_operator.get_docker_instances():
             return False
         return True
 
@@ -198,6 +213,7 @@ class PXEInstallNewDocker(Step):
         for docker_item in self.pxe_operator.get_docker_instances():
             if docker_item["image_uri"] == self.image_uri and docker_item["status"] == "up":
                     return True
+        self._logger.info("current docker status is {}".format(self.pxe_operator.get_docker_instances()))
         return False
 
 
@@ -210,7 +226,7 @@ class PXERestartDockerIfFHGWSessionFailed(RetriedStep):
 
     def _wait_until_session_started(self):
         start_time = time.time()
-        while time.time() -  start_time < 5*60 :
+        while time.time() - start_time < 5*60:
             result = self._pxe_operator.execute("tail -10 {} | grep 'session \"fhgw\" started' |  wc -l".format(self._output_session_log))
             if int(result.strip()):
                 break
@@ -303,6 +319,7 @@ class TriggerFHGWStartInstallation(RetriedStep):
         code_dir = os.path.dirname(os.path.abspath(__file__))
         self._pxe_operator.put_file(os.path.join(code_dir, "scripts", "boot_priority.json"), "/root/boot_priority.json")
         self._pxe_operator.put_file(os.path.join(code_dir, "scripts", "setbootdevice.sh"), "/root/setbootdevice.sh")
+        self._logger.info("uploaded boot_priority.json and setbootdevice.sh to pxe server")
         self._pxe_operator.execute("chmod +x /root/setbootdevice.sh")
         return True
 
@@ -326,17 +343,26 @@ class TriggerFHGWStartInstallation(RetriedStep):
                 bmc_user=self._bmc_info["username"],
                 bmc_password=self._bmc_info["password"]))
             if "successfully" not in result:
-                break
+                self._logger.warn("reboot fhgw failed through bmc")
+                continue
             time.sleep(5)
         time.sleep(20)
 
     def post_check(self):
         result = self._wait_until_fhgw_connection_created()
         if not result:
+            self._logger.warn("fhgw connection can't be created in 20 minutes")
             return False
-        if (self._fhgw_operator.fhgw_get_sw_build() == self.get_param("fhgw_build") and
-                self._fhgw_operator.fhgw_get_sw_release() == self.get_param("fhgw_release")):
+        current_release = self._fhgw_operator.fhgw_get_sw_release()
+        current_build = self._fhgw_operator.fhgw_get_sw_build()
+        if (current_build == self.get_param("fhgw_build") and
+                current_release == self.get_param("fhgw_release")):
             return True
+        self._logger.warn("current release: {current_release} and current build: {current_build}, not equal to "
+                          "target release: {target_release} and target build: {target_build}".format(current_release=current_release,
+                                                                                                     current_build=current_build,
+                                                                                                     target_release=self.get_param("fhgw_release"),
+                                                                                                     target_build=self.get_param("fhgw_build")))
         return False
 
 
