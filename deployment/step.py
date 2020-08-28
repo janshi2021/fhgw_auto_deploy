@@ -71,7 +71,6 @@ class FHGWISOPreparation(RetriedStep):
         )
         result = self._pxe_operator.execute(download_cmd)
         self._logger.info("download iso successfully")
-        self._logger.debug(result)
 
     def _sha256check(self):
         if not self._pxe_operator.file_exists(self._iso_file_path + ".sha256"):
