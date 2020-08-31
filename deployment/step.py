@@ -152,12 +152,14 @@ class PXEDockerExist(NoPostCheckStep):
 
     def _start_docker(self):
         for docker_item in self.pxe_operator.get_docker_instances():
+            print(docker_item["image_uri"], self.image_uri)
             if docker_item["image_uri"].lower().strip() == self.image_uri.lower().strip():
                 if docker_item["status"] == "exited":
                     self.pxe_operator.start_docker_by_id(docker_item["id"])
 
     def _check_docker_exist(self):
         for docker_item in self.pxe_operator.get_docker_instances():
+            print("##", docker_item["image_uri"], self.image_uri)
             if docker_item["image_uri"].lower().strip() == self.image_uri.lower().strip() and docker_item["status"] == "up":
                 self._logger.debug("matched docker instance is exist")
                 return True
