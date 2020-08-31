@@ -179,11 +179,13 @@ class PXEInstallNewDocker(Step):
 
     def _run(self):
         input_data_path = self.get_param("input_data_path")
+        output_data_path = self.get_param("output_data_path")
         self._fhgw_iso_version = self.get_param("fhgw_iso_version")
         iso_file_path = os.path.join(input_data_path, self._fhgw_iso_version + ".iso")
         iso_sha256_file_path = os.path.join(input_data_path, self._fhgw_iso_version + ".iso.sha256")
         pxe_operator = self.get_param("pxe_operator")
         image_tag = self.get_param("image_tag")
+        pxe_operator.execute('echo "" > {session_creat_log}'.format(session_creat_log=os.path.join(output_data_path, "session_create.log")))
         pxe_operator.execute("mount -o loop {iso_file_path} /mnt".format(iso_file_path=iso_file_path))
         pxe_operator.execute("cp -f /mnt/MISC/SWInstallEnabler/scripts/startInstallation.sh {input_data_path}".format(input_data_path=input_data_path))
         pxe_operator.execute("umount /mnt")
