@@ -330,10 +330,13 @@ class TriggerFHGWStartInstallation(RetriedStep):
 
     def _run(self):
         for i in range(5):
-            result = self._pxe_operator.execute("cd /root && ./setbootdevice.sh -i {bmc_host} -m Legacy -o Once -b Pxe -u {bmc_user} -p {bmc_password}".format(
+            trigger_cmd = "cd /root && ./setbootdevice.sh -i {bmc_host} -m Legacy -o Once -b Pxe -u {bmc_user} -p {bmc_password}".format(
                 bmc_host=self._bmc_info["host"],
                 bmc_user=self._bmc_info["username"],
-                bmc_password=self._bmc_info["password"]))
+                bmc_password=self._bmc_info["password"])
+            result = self._pxe_operator.execute(trigger_cmd)
+            self._logger.info(trigger_cmd)
+            self._logger.info(result)
             if "successfully" not in result:
                 self._logger.warn("reboot fhgw failed through bmc, will retry #{index}".format(index=i+1))
                 continue
