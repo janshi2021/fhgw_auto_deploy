@@ -140,7 +140,7 @@ class PXEStopAllDockers(Step):
         return True
 
 
-class PXEDockerExist(Step):
+class PXEDockerExist(NoPostCheckStep):
 
     def pre_check(self):
         image_tag = self.get_param("image_tag")
@@ -150,19 +150,30 @@ class PXEDockerExist(Step):
         self.pxe_operator = self.get_param("pxe_operator")
         return True
 
-    def _run(self):
+    def _start_docker(self):
         for docker_item in self.pxe_operator.get_docker_instances():
-            if docker_item["image_uri"] == self.image_uri:
+            if docker_item["image_uri"].lower().strip() == self.image_uri.lower().strip():
                 if docker_item["status"] == "exited":
                     self.pxe_operator.start_docker_by_id(docker_item["id"])
 
-    def post_check(self):
+    def _check_docker_exist(self):
         for docker_item in self.pxe_operator.get_docker_instances():
-            if docker_item["image_uri"] == self.image_uri and docker_item["status"] == "up":
+            if docker_item["image_uri"].lower().strip() == self.image_uri.lower().strip() and docker_item["status"] == "up":
                 self._logger.debug("matched docker instance is exist")
+                return True
+        return False
+
+    def _run(self):
+        if self._check_docker_exist():
+            self.put_param(docker_exists=True)
+            return True
+        else:
+            self._start_docker()
+            if self._check_docker_exist():
                 self.put_param(docker_exists=True)
+                return True
         self.put_param(docker_exists=False)
-        return True
+        return False
 
 
 class PXERemoveExistDocker(Step):
@@ -180,11 +191,12 @@ class PXERemoveExistDocker(Step):
 
     def post_check(self):
         if self.get_param("docker_exists"):
+            self._logger.info("expected docker exists, no need to remove it")
             return True
         if self._pxe_operator.get_docker_instances():
+            self._logger.info("will remove exist dockers")
             return False
         return True
-
 
 class PXEInstallNewDocker(Step):
 
