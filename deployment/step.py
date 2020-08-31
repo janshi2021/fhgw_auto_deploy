@@ -61,7 +61,7 @@ class FHGWVersionCheck(NoPostCheckStep):
 class FHGWISOPreparation(RetriedStep):
 
     def _download(self, file_suffix=".iso"):
-        self._pxe_operator.execute("cd {input_data_path} && rm *.iso".format(input_data_path=self.get_param("input_data_path")))
+        self._pxe_operator.execute("cd {input_data_path} && rm *.iso && rm *.iso.sha256".format(input_data_path=self.get_param("input_data_path")))
         download_cmd = "wget --no-check-certificate https://bhisoj70.apac.nsn-net.net" \
                        "/artifactory/fhgw-releasedbuilds/builds/FHGW20/{release}/{iso_version}" \
                        " -P {input_data_path}".format(
