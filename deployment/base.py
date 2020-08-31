@@ -62,8 +62,7 @@ class Deployment(object):
                 self._logger.error("## post check of step {step_name} failed, please have a check".format(step_name=step.step_name))
                 raise ExecutionException("post check of step {step_name} failed, please have a check".format(step_name=step.step_name))
             if not step.cont:
-                self._logger.warn("## the deployment should be end after this step {step_name}".format(step_name=step.step_name))
-                raise ExecutionException("the deployment should be end after this step {step_name}".format(step_name=step.step_name))
+                self._logger.warn("## the deployment should be end after this step {step_name} because of rest steps are unecessary".format(step_name=step.step_name))
             self._global_params = step.global_params
             if step.step_to_go:
                 self._logger.warn("## step {step_name} will go to another step {another_step_name} to exeucte ".format(

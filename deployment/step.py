@@ -115,31 +115,6 @@ class FHGWISOPreparation(RetriedStep):
         self._download(file_suffix=".iso")
 
 
-class PXEStopAllDockers(Step):
-
-    def pre_check(self):
-        if self.get_param("docker_exists"):
-            return False
-        self.pxe_operator = self.get_param("pxe_operator")
-        return True
-
-    def _run(self):
-        docker_instances = self.pxe_operator.get_docker_instances()
-        running_docker_id_list = []
-        for docker_instance in docker_instances:
-            running_docker_id_list.append(docker_instance["id"])
-        self.pxe_operator.stop_docker_by_ids(running_docker_id_list)
-        self._logger.info("runnder container list {} have been stoped".format(running_docker_id_list))
-
-    def post_check(self):
-        docker_instances = self.pxe_operator.get_docker_instances()
-        self._loger.info("docker instances are {}".format(docker_instances))
-        for docker_instance in self.docker_instances:
-            if docker_instance["status"] == "up":
-                return False
-        return True
-
-
 class PXEDockerExist(NoPostCheckStep):
 
     def pre_check(self):

@@ -14,6 +14,7 @@ class Logger(object):
 
     def _log_directly(self, msg):
         sys.stdout.write(msg + "\n")
+        sys.stdout.flush()
 
     def info(self, msg):
         self._log_directly("<<INFO - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
