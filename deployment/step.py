@@ -179,6 +179,8 @@ class PXERemoveExistDocker(Step):
         self._logger.info("remove docker instances {} successfully".format(docker_instances))
 
     def post_check(self):
+        if self.get_param("docker_exists"):
+            return True
         if self._pxe_operator.get_docker_instances():
             return False
         return True
@@ -203,7 +205,7 @@ class PXEInstallNewDocker(Step):
 
     def post_check(self):
         if self.get_param("docker_exists"):
-            return False
+            return True
         image_tag = self.get_param("image_tag")
         fhgw_release = self.get_param("fhgw_release")
         swinstallenabler_repo = "fhgw-ci-docker-local.bhisoj70.apac.nsn-net.net"
@@ -377,4 +379,5 @@ class ClearFirewallAndStopRelatedSerices(NoPostCheckStep):
         self._pxe_operator.execute("setenforce 0")
         self._pxe_operator.execute("systemctl stop firewalld")
         self._pxe_operator.execute("systemctl stop tftp.socket")
+        self._logger.info("clear firewall successfully")
 
