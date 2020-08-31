@@ -1,4 +1,5 @@
 import time
+import sys
 
 
 class Logger(object):
@@ -11,17 +12,20 @@ class Logger(object):
         timestamp = time.strftime("%Z-%Y/%m/%d-%H:%M:%S") + "." + millisecond
         return timestamp
 
+    def _log_directly(self, msg):
+        sys.stdout.write(msg + "\n")
+
     def info(self, msg):
-        print("<<INFO - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+        self._log_directly("<<INFO - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
 
     def debug(self, msg):
-        print("<<DEBUG - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+        self._log_directly("<<DEBUG - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
 
     def warn(self, msg):
-        print("<<WARN - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+        self._log_directly("<<WARN - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
 
     def error(self, msg):
-        print("<<ERROR - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+        self._log_directly("<<ERROR - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
 
     def log_header(self, msg):
-        print("<<STEP - {timestamp}>>: ####".format(timestamp=self._get_timestamp()) + msg.upper())
+        self._log_directly("<<STEP - {timestamp}>>: ####".format(timestamp=self._get_timestamp()) + msg.upper())
