@@ -2,6 +2,8 @@ from deployment.deployment import ISODeployment
 import argparse
 from deployment.logger import Logger
 import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 
 if __name__ == "__main__":

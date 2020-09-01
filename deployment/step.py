@@ -1,6 +1,9 @@
 import os
 import time
 from base import Step, RetriedStep, NoPostCheckStep
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 
 class PXEConnection(Step):
@@ -336,6 +339,7 @@ class TriggerFHGWStartInstallation(RetriedStep):
                 bmc_password=self._bmc_info["password"])
             result = self._pxe_operator.execute(trigger_cmd)
             self._logger.info(trigger_cmd)
+            self._logger.info(result)
             if "successfully" not in result:
                 self._logger.warn("reboot fhgw failed through bmc, will retry #{index}".format(index=i+1))
                 continue
