@@ -338,8 +338,6 @@ class TriggerFHGWStartInstallation(RetriedStep):
                 bmc_user=self._bmc_info["username"],
                 bmc_password=self._bmc_info["password"])
             result = self._pxe_operator.execute(trigger_cmd)
-            self._logger.info(trigger_cmd)
-            self._logger.info(result)
             if "successfully" not in result:
                 self._logger.warn("reboot fhgw failed through bmc, will retry #{index}".format(index=i+1))
                 continue

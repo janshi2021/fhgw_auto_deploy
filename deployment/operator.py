@@ -8,6 +8,7 @@ class Operator(SSHLibrary):
         self._username = username
         self._password = password
         self._kwargs = kwargs
+        self._logger = kwargs.get("logger")
         self.connected = False
         super(Operator, self).__init__()
 
@@ -24,11 +25,14 @@ class Operator(SSHLibrary):
         self.write(cmd + "\n")
 
     def execute(self, cmd, check_result=False):
+        self._logger.debug(cmd)
         stdout, stderr, rc = self.execute_command(cmd, return_stderr=True, return_rc=True)
         if rc != 0 and check_result:
             raise RuntimeError(
                 "Command '%s' returned '%s' but '%s' was expected" % (cmd, rc, "0"))
-        return stdout + stderr
+        output = stdout + stderr
+        self._logger.debug(output)
+        return output
 
     def get_file_size(self, file_path):
         return self.execute("ls -l {file_path} | awk '{{print $5}}'".format(file_path=file_path))
@@ -95,8 +99,11 @@ class FHGWOperator(Operator):
 
     def execute(self, command, check_result=False):
         echo_result = self._execute("echo")
+        self._logger.debug(command)
         cmd_result = self._execute(command, check_result=check_result)
-        return cmd_result.replace(echo_result.strip(), "").strip()
+        output = cmd_result.replace(echo_result.strip(), "").strip()
+        self._logger.debug(output)
+        return output
 
     def _check_cmd_result(self, cmd):
         return_code_flag = "return code is:"
