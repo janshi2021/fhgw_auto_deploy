@@ -17,16 +17,16 @@ class Logger(object):
         sys.stdout.flush()
 
     def info(self, msg):
-        self._log_directly("<<INFO - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+        self._log_directly("<<INFO - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg)
 
     def debug(self, msg):
-        self._log_directly("<<DEBUG - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+        self._log_directly("<<DEBUG - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg)
 
     def warn(self, msg):
-        self._log_directly("<<WARN - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+        self._log_directly("<<WARN - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg)
 
     def error(self, msg):
-        self._log_directly("<<ERROR - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg.title())
+        self._log_directly("<<ERROR - {timestamp}>>: ".format(timestamp=self._get_timestamp()) + msg)
 
     def log_header(self, msg):
-        self._log_directly("<<STEP - {timestamp}>>: ####".format(timestamp=self._get_timestamp()) + msg.upper())
+        self._log_directly("<<STEP - {timestamp}>>: ####".format(timestamp=self._get_timestamp()) + msg)
